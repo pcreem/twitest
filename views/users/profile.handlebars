@@ -1,0 +1,65 @@
+<div class="card mb-3">
+  <div class="row no-gutters">
+    <div class="col-md-4">
+
+      <div class="card-body">
+        {{#if profile.avatar}}
+        <img class="img-thumbnail" src="{{profile.avatar}}" />
+        {{else}}
+        <img src="https://via.placeholder.com/300" width="300px" height="300px" />
+        {{/if}}
+        <h5 class="card-title">{{profile.name}}</h5>
+        <p class="card-text">
+          {{profile.introduction}}
+        </p>
+        <ul class="list-unstyled list-inline">
+          <li>Tweet <strong>{{profile.Tweets.length}}</strong></li>
+          <li>followings <strong>{{profile.Followings.length}}</strong></li>
+          <li>followers <strong>{{profile.Followers.length}}</strong></li>
+          <li>Like <strong>{{profile.Likes.length}}</strong></li>
+        </ul>
+        <p>
+          {{#ifCond profile.id user.id }}
+          <a href="/users/{{profile.id}}/edit"><button type="submit" class="btn btn-primary">Edit Profile</button></a>
+          {{else}}
+          {{#if this.isFollowed }}
+          <form action="/following/{{profile.id}}?_method=DELETE" method="POST" style="display: contents;"><button
+              type="submit" class="btn btn-danger">取消追蹤</button></form>
+          {{else}}
+          <form action="/following/{{profile.id}}" method="POST" style="display: contents;"><button type="submit"
+              class="btn btn-primary">追蹤</button></form>
+          {{/if}}
+          {{/ifCond}}
+        </p>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <div class="container">
+          {{#each tweets}}
+          <div class="row">
+            <div class="col-md-4"><img class="img-thumbnail" src="{{this.User.avatar}}"></div>
+            <div class="col-md-8">
+              <h4>
+                <a href="/tweets/{{this.id}}">{{this.User.name}}</a>
+                <small>, {{moment this.createdAt}}</small>
+              </h4>
+              <p>{{this.description}}</p>
+
+              {{#if this.Replies.length }}
+              <a href="/tweets/{{this.id}}/replies">Reply({{this.Replies.length}}) </a>
+              {{/if}}
+              {{#if this.Likes.length }}
+              <p style="display: inline;"> Like({{this.Likes.length}})</p>
+              {{/if}}
+
+
+            </div>
+          </div>
+          <hr>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,97 @@
+<div class="row no-gutters">
+  <div class="col-md-4">
+    {{#if tweet.User.avatar}}
+    <img class="img-thumbnail" src="{{tweet.User.avatar}}" width="300px" height="300px" />
+    {{else}}
+    <img src="https://via.placeholder.com/300" width="300px" height="300px" />
+    {{/if}}
+    <div class="card-body">
+      <h5 class="card-title">{{tweet.User.name}}</h5>
+      <p class="card-text">
+        {{tweet.User.introduction}}
+      </p>
+      <ul class="list-unstyled list-inline">
+        <li><strong>{{profile.Tweets.length}}</strong> Tweets</li>
+        <li><strong>{{profile.Followings.length}}</strong> followings (追蹤者)</li>
+        <li><strong>{{profile.Followers.length}}</strong> followers (追隨者)</li>
+        <li><strong>{{profile.Likes.length}}</strong> Likes</li>
+      </ul>
+      <p>
+        {{#ifCond loginUser.id tweet.User.id }}
+        <a href="/users/{{profile.id}}/edit"><button type="submit" class="btn btn-primary">edit</button></a>
+        {{else}}
+        {{#if this.isFollowed }}
+        <form action="/following/{{profile.id}}?_method=DELETE" method="POST" style="display: contents;"><button
+            type="submit" class="btn btn-danger">unFollow</button></form>
+        {{else}}
+        <form action="/following/{{profile.id}}" method="POST" style="display: contents;"><button type="submit"
+            class="btn btn-primary">Follow</button></form>
+        {{/if}}
+        {{/ifCond}}
+      </p>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        Tweets
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4"><img class="img-thumbnail" src="{{tweet.User.avatar}}"
+              style="width: 250px;margin-bottom: 25px;"></div>
+          <div class="col-md-8">
+            <h4>
+              <a href="/tweets/{{this.id}}">{{tweet.User.name}}</a>
+            </h4>
+            <p>{{tweet.description}}</p>
+            {{#if tweet.Replies.length }}
+            <a href="/tweets/{{this.id}}/replies">Reply({{tweet.Replies.length}}) </a>
+            {{/if}}
+            {{#if tweet.Likes.length }}
+            <p style="display: inline;"> Like({{tweet.Likes.length}})</p>
+            {{/if}}
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <div class="card">
+      <div class="card-header">
+        Replies
+      </div>
+      <div class="card-body">
+        {{#each replies}}
+        <div class="row">
+          <div class="col-md-4"><img class="img-thumbnail" src="{{this.User.avatar}}"
+              style="width: 250px;margin-bottom: 25px;"></div>
+          <div class="col-md-8">
+            <h4>
+              <small><a href="/tweets/{{this.id}}">{{this.User.name}}</a>, {{moment this.createdAt}}</small>
+            </h4>
+            <p>{{this.comment}}</p>
+
+
+          </div>
+        </div>
+        <hr>
+        {{/each}}
+      </div>
+    </div>
+    <br />
+    <form action="/tweets/{{tweet.id}}/replies" method="POST">
+      <div class="form-group">
+        <textarea placeholder="What's on your mind?" class="form-control" id="text" name="text" rows="4"
+          required></textarea>
+      </div>
+      <input type="hidden" name="tweetId" value="{{tweet.id}}" />
+      <button type="submit" class="btn btn-primary float-right">Reply</button>
+    </form>
+    <br /><br />
+
+  </div>
+
+
+</div>
