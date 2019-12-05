@@ -42,15 +42,23 @@
               style="width: 250px;margin-bottom: 25px;"></div>
           <div class="col-md-8">
             <h4>
-              <a href="/tweets/{{this.id}}">{{tweet.User.name}}</a>
+              <a href="/users/{{tweet.User.id}}/tweets">{{tweet.User.name}}</a>
             </h4>
             <p>{{tweet.description}}</p>
             {{#if tweet.Replies.length }}
-            <a href="/tweets/{{this.id}}/replies">Reply({{tweet.Replies.length}}) </a>
+            <a href="/tweets/{{tweet.id}}/replies">Reply({{tweet.Replies.length}}) </a>
             {{/if}}
-            {{#if tweet.Likes.length }}
-            <p style="display: inline;"> Like({{tweet.Likes.length}})</p>
+
+            {{#if isLiked }}
+            <form style="display: inline;" action="/tweets/{{tweet.id}}/unlike" method="POST"><button type="submit"
+                class="btn btn-danger">unlike ({{tweet.Likes.length}})</button>
+            </form>
+            {{else}}
+            <form style="display: inline;" action="/tweets/{{tweet.id}}/like" method="POST"><button type="submit"
+                class="btn btn-primary">Like
+                ({{tweet.Likes.length}})</button></form>
             {{/if}}
+
 
           </div>
         </div>

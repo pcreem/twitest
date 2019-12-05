@@ -11,14 +11,15 @@ const tweetController = {
     return User.findAll({
       where: { id: { $not: req.user.id } },
       include: [
-        { model: User, as: 'Followers' }
+        { model: User, as: 'Followers' },
+        //{ model: Tweet, as: 'LikedTweets' }
       ]
     }).then(users => {
       users = users.map(user => ({
         ...user.dataValues,
         introduction: user.dataValues.introduction.substring(0, 140),
         FollowerCount: user.Followers.length,
-        isFollowed: req.user.Followings.map(d => d.id).includes(user.id)
+
       }))
       users = users.sort((a, b) => b.FollowerCount - a.FollowerCount).splice(0, 10)
 
@@ -29,7 +30,7 @@ const tweetController = {
         tweets = tweets.map(tweet => ({
           ...tweet.dataValues,
           description: tweet.dataValues.description.substring(0, 140),
-
+          isLiked: req.user.LikedTweets.map(d => d.id).includes(tweet.id)
         }))
 
         return res.render('Tweets', {
@@ -52,9 +53,10 @@ const tweetController = {
 
   getReply: (req, res) => {
     return Tweet.findByPk(req.params.tweet_id, {
-      include: [Like, Reply, User]
+      include: [Like, Reply, User, { model: User, as: 'LikedUsers' },]
     }).then(tweet => {
-      console.log(tweet.UserId)
+      const isLiked = tweet.LikedUsers.map(d => d.id).includes(req.user.id)
+
       User.findByPk(tweet.UserId, {
 
         include: [
@@ -84,6 +86,7 @@ const tweetController = {
             profile: user,
             loginUser: req.user,
             isFollowed: isFollowed,
+            isLiked: isLiked
           })
         })
       })

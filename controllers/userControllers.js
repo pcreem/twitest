@@ -93,7 +93,7 @@ const userController = {
       user.introduction = user.introduction.substring(0, 140)
 
       Tweet.findAll({
-        where: { UserId: req.user.id },
+        where: { UserId: req.params.id },
         order: [['createdAt', 'DESC']],
         include: [Like, Reply, User]
       }).then(tweets => {
@@ -101,6 +101,7 @@ const userController = {
         tweets = tweets.map(tweet => ({
           ...tweet.dataValues,
           description: tweet.dataValues.description.substring(0, 140),
+          isLiked: req.user.LikedTweets.map(d => d.id).includes(tweet.id)
         }))
 
         return res.render('users/profile', {
@@ -149,7 +150,30 @@ const userController = {
     }
   },
 
+  addLike: (req, res) => {
+    return Like.create({
+      UserId: req.user.id,
+      TweetId: req.params.id
+    })
+      .then((tweet) => {
+        return res.redirect('back')
+      })
+  },
 
+  removeLike: (req, res) => {
+    return Like.findOne({
+      where: {
+        UserId: req.user.id,
+        TweetId: req.params.id
+      }
+    })
+      .then((Like) => {
+        Like.destroy()
+          .then((tweet) => {
+            return res.redirect('back')
+          })
+      })
+  },
 }
 
 module.exports = userController

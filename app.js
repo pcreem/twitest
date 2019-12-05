@@ -44,5 +44,6 @@ app.listen(port, () => {
 })
 
 require('./routes')(app, passport)
+module.exports = app;
 
 

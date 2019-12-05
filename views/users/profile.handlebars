@@ -24,10 +24,10 @@
           {{else}}
           {{#if this.isFollowed }}
           <form action="/following/{{profile.id}}?_method=DELETE" method="POST" style="display: contents;"><button
-              type="submit" class="btn btn-danger">取消追蹤</button></form>
+              type="submit" class="btn btn-danger">unFollow</button></form>
           {{else}}
           <form action="/following/{{profile.id}}" method="POST" style="display: contents;"><button type="submit"
-              class="btn btn-primary">追蹤</button></form>
+              class="btn btn-primary">Follow</button></form>
           {{/if}}
           {{/ifCond}}
         </p>
@@ -41,7 +41,7 @@
             <div class="col-md-4"><img class="img-thumbnail" src="{{this.User.avatar}}"></div>
             <div class="col-md-8">
               <h4>
-                <a href="/tweets/{{this.id}}">{{this.User.name}}</a>
+                <a href="/users/{{this.User.id}}/tweets">{{this.User.name}}</a>
                 <small>, {{moment this.createdAt}}</small>
               </h4>
               <p>{{this.description}}</p>
@@ -49,9 +49,20 @@
               {{#if this.Replies.length }}
               <a href="/tweets/{{this.id}}/replies">Reply({{this.Replies.length}}) </a>
               {{/if}}
-              {{#if this.Likes.length }}
+              {{!-- {{#if this.Likes.length }}
               <p style="display: inline;"> Like({{this.Likes.length}})</p>
+              {{/if}} --}}
+
+              {{#if this.isLiked }}
+              <form style="display: inline;" action="/tweets/{{this.id}}/unlike" method="POST"><button type="submit"
+                  class="btn btn-danger">unlike ({{this.Likes.length}})</button>
+              </form>
+              {{else}}
+              <form style="display: inline;" action="/tweets/{{this.id}}/like" method="POST"><button type="submit"
+                  class="btn btn-primary">Like
+                  ({{this.Likes.length}})</button></form>
               {{/if}}
+
 
 
             </div>
