@@ -11,22 +11,22 @@ const db = require('../../models')
 describe('# user request', () => {
 
   context('# tweets', () => {
-    before(async() => {
-      
+    before(async () => {
+
       this.ensureAuthenticated = sinon.stub(
         helpers, 'ensureAuthenticated'
       ).returns(true);
       this.getUser = sinon.stub(
         helpers, 'getUser'
-      ).returns({id: 1, Followings: []});
+      ).returns({ id: 1/*, Followings: []*/ });
 
-      await db.User.destroy({where: {},truncate: true})
-      await db.Tweet.destroy({where: {},truncate: true})
+      await db.User.destroy({ where: {}, truncate: true })
+      await db.Tweet.destroy({ where: {}, truncate: true })
 
       await db.User.create({})
       await db.User.create({})
-      await db.Tweet.create({UserId: 1, description: 'User1 的 Tweet'})
-      await db.Tweet.create({UserId: 2, description: 'User2 的 Tweet'})
+      await db.Tweet.create({ UserId: 1, description: 'User1 的 Tweet' })
+      await db.Tweet.create({ UserId: 2, description: 'User2 的 Tweet' })
     })
 
     describe('go to current_user page', () => {
@@ -35,7 +35,7 @@ describe('# user request', () => {
           .get('/users/1/tweets')
           .set('Accept', 'application/json')
           .expect(200)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             res.text.should.include('User1 的 Tweet')
             return done();
@@ -48,7 +48,7 @@ describe('# user request', () => {
           .get('/users/2/tweets')
           .set('Accept', 'application/json')
           .expect(200)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             res.text.should.include('User2 的 Tweet')
             return done();
@@ -57,24 +57,24 @@ describe('# user request', () => {
     })
 
     after(async () => {
-      
+
       this.ensureAuthenticated.restore();
       this.getUser.restore();
 
-      await db.User.destroy({where: {},truncate: true})
-      await db.Tweet.destroy({where: {},truncate: true})
+      await db.User.destroy({ where: {}, truncate: true })
+      await db.Tweet.destroy({ where: {}, truncate: true })
     })
   })
 
   context('# edit', () => {
-    before(async() => {
-      
+    before(async () => {
+
       this.ensureAuthenticated = sinon.stub(
         helpers, 'ensureAuthenticated'
       ).returns(true);
       this.getUser = sinon.stub(
-          helpers, 'getUser'
-        ).returns({id: 1, Followings: []});
+        helpers, 'getUser'
+      ).returns({ id: 1, Followings: [] });
       await db.User.create({})
       await db.User.create({})
     })
@@ -85,7 +85,7 @@ describe('# user request', () => {
           .get('/users/1/edit')
           .set('Accept', 'application/json')
           .expect(200)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             return done();
           });
@@ -95,30 +95,31 @@ describe('# user request', () => {
           .get('/users/2/edit')
           .set('Accept', 'application/json')
           .expect(302)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
-            return done();
+            return done()
+              ;
           });
       })
     })
 
     after(async () => {
-      
+
       this.ensureAuthenticated.restore();
       this.getUser.restore();
-      await db.User.destroy({where: {},truncate: true})
+      await db.User.destroy({ where: {}, truncate: true })
     })
   })
 
   context('#update', () => {
-    before(async() => {
-      
+    before(async () => {
+
       this.ensureAuthenticated = sinon.stub(
         helpers, 'ensureAuthenticated'
       ).returns(true);
       this.getUser = sinon.stub(
         helpers, 'getUser'
-      ).returns({id: 1, Followings: []});
+      ).returns({ id: 1, Followings: [] });
       await db.User.create({})
     })
 
@@ -129,7 +130,7 @@ describe('# user request', () => {
           .send('name=abc')
           .set('Accept', 'application/json')
           .expect(302)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             db.User.findByPk(1).then(user => {
               user.name.should.equal('abc');
@@ -140,31 +141,31 @@ describe('# user request', () => {
     })
 
     after(async () => {
-      
+
       this.ensureAuthenticated.restore();
       this.getUser.restore();
-      await db.User.destroy({where: {},truncate: true})
+      await db.User.destroy({ where: {}, truncate: true })
     })
   })
 
   context('#followings #followers', () => {
-    before(async() => {
-      
+    before(async () => {
+
       this.ensureAuthenticated = sinon.stub(
         helpers, 'ensureAuthenticated'
       ).returns(true);
       this.getUser = sinon.stub(
         helpers, 'getUser'
-      ).returns({id: 1, Followings: []});
-      await db.User.create({name: 'User1'})
-      await db.User.create({name: 'User2'})
-      await db.User.create({name: 'User3'})
+      ).returns({ id: 1, Followings: [] });
+      await db.User.create({ name: 'User1' })
+      await db.User.create({ name: 'User2' })
+      await db.User.create({ name: 'User3' })
 
       const date = new Date();
-      await db.Followship.create({followerId: 1, followingId: 2})
-      await db.Followship.create({followerId: 1, followingId: 3})
-      await db.Followship.create({followerId: 2, followingId: 1})
-      await db.Followship.create({followerId: 3, followingId: 1})
+      await db.Followship.create({ followerId: 1, followingId: 2 })
+      await db.Followship.create({ followerId: 1, followingId: 3 })
+      await db.Followship.create({ followerId: 2, followingId: 1 })
+      await db.Followship.create({ followerId: 3, followingId: 1 })
     })
 
     describe('go to followings page', () => {
@@ -173,7 +174,7 @@ describe('# user request', () => {
           .get('/users/1/followings')
           .set('Accept', 'application/json')
           .expect(200)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             res.text.should.include('User2')
             return done();
@@ -184,7 +185,7 @@ describe('# user request', () => {
           .get('/users/1/followings')
           .set('Accept', 'application/json')
           .expect(200)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             res.text.indexOf('User3').should.above(res.text.indexOf('User2'))
             return done();
@@ -198,7 +199,7 @@ describe('# user request', () => {
           .get('/users/1/followers')
           .set('Accept', 'application/json')
           .expect(200)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             res.text.should.include('User3')
             return done();
@@ -209,7 +210,7 @@ describe('# user request', () => {
           .get('/users/1/followings')
           .set('Accept', 'application/json')
           .expect(200)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             res.text.indexOf('User3').should.above(res.text.indexOf('User2'))
             return done();
@@ -218,27 +219,27 @@ describe('# user request', () => {
     })
 
     after(async () => {
-      
+
       this.ensureAuthenticated.restore();
       this.getUser.restore();
-      await db.User.destroy({where: {},truncate: true})
-      await db.Followship.destroy({where: {},truncate: true})
+      await db.User.destroy({ where: {}, truncate: true })
+      await db.Followship.destroy({ where: {}, truncate: true })
 
     })
   })
 
   context('#likes', () => {
-    before(async() => {
-      
+    before(async () => {
+
       this.ensureAuthenticated = sinon.stub(
         helpers, 'ensureAuthenticated'
       ).returns(true);
       this.getUser = sinon.stub(
         helpers, 'getUser'
-      ).returns({id: 1, Followings: []});
+      ).returns({ id: 1, Followings: [] });
       await db.User.create({})
-      await db.Tweet.create({UserId: 1, description: 'Tweet1'})
-      await db.Like.create({UserId: 1, TweetId: 1})
+      await db.Tweet.create({ UserId: 1, description: 'Tweet1' })
+      await db.Like.create({ UserId: 1, TweetId: 1 })
     })
 
     describe('go to likes page', () => {
@@ -247,7 +248,7 @@ describe('# user request', () => {
           .get('/users/1/likes')
           .set('Accept', 'application/json')
           .expect(200)
-          .end(function(err, res) {
+          .end(function (err, res) {
             if (err) return done(err);
             res.text.should.include('Tweet1')
             return done();
@@ -256,12 +257,12 @@ describe('# user request', () => {
     })
 
     after(async () => {
-      
+
       this.ensureAuthenticated.restore();
       this.getUser.restore();
-      await db.User.destroy({where: {},truncate: true})
-      await db.Tweet.destroy({where: {},truncate: true})
-      await db.Like.destroy({where: {},truncate: true})
+      await db.User.destroy({ where: {}, truncate: true })
+      await db.Tweet.destroy({ where: {}, truncate: true })
+      await db.Like.destroy({ where: {}, truncate: true })
     })
   })
 

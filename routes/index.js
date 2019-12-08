@@ -20,8 +20,8 @@ module.exports = (app, passport) => {
 
   //app.delete('/tweets/:id', authenticatedAdmin, commentController.deleteComment)
 
-  app.post('/following/:userId', authenticated, userController.addFollowing)
-  app.delete('/following/:userId', authenticated, userController.removeFollowing)
+  app.post('/followships/:userId', authenticated, userController.addFollowing)
+  app.delete('/followships/:userId', authenticated, userController.removeFollowing)
 
   app.post('/tweets/:id/like', authenticated, userController.addLike)
   app.post('/tweets/:id/unlike', authenticated, userController.removeLike)

@@ -17,7 +17,7 @@ const tweetController = {
     }).then(users => {
       users = users.map(user => ({
         ...user.dataValues,
-        introduction: user.dataValues.introduction.substring(0, 140),
+        introduction: user.dataValues.introduction ? user.dataValues.introduction.substring(0, 140) : "",
         FollowerCount: user.Followers.length,
 
       }))
@@ -29,7 +29,7 @@ const tweetController = {
       }).then(tweets => {
         tweets = tweets.map(tweet => ({
           ...tweet.dataValues,
-          description: tweet.dataValues.description.substring(0, 140),
+          description: tweet.dataValues.description ? tweet.dataValues.description.substring(0, 140) : "",
           isLiked: req.user.LikedTweets.map(d => d.id).includes(tweet.id)
         }))
 
@@ -67,7 +67,7 @@ const tweetController = {
         ]
       }).then(user => {
         const isFollowed = req.user.Followings.map(d => d.id).includes(user.id)
-        user.introduction = user.introduction.substring(0, 140)
+        user.introduction = user.dataValues.introduction ? user.dataValues.introduction.substring(0, 140) : ""
 
         Reply.findAll({
           where: { TweetId: req.params.tweet_id },
