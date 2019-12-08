@@ -55,13 +55,16 @@ const userController = {
   },
 
   addFollowing: (req, res) => {
-    return Followship.create({
-      followerId: req.user.id,
-      followingId: req.params.userId
-    })
-      .then((followship) => {
-        return res.redirect('back')
+    if (req.user.id == req.params.userId) { return res.redirect('back') }
+    else {
+      return Followship.create({
+        followerId: req.user.id,
+        followingId: req.params.userId
       })
+        .then((followship) => {
+          return res.redirect('back')
+        })
+    }
   },
 
   removeFollowing: (req, res) => {
@@ -114,9 +117,15 @@ const userController = {
     })
   },
   editUser: (req, res) => {
-    return User.findByPk(req.params.id).then(user => {
-      return res.render('users/edit', { user: user })
-    })
+    if (parseInt(req.params.id) !== req.user.id) {
+      req.flash('error_messages', '非使用者！')
+      return res.redirect('/')
+    }
+    else {
+      return User.findByPk(req.params.id).then(user => {
+        return res.render('users/edit', { user: user })
+      })
+    }
   },
   putUser: (req, res) => {
     if (Number(req.params.id) !== Number(req.user.id)) {
