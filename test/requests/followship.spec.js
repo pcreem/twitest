@@ -26,8 +26,8 @@ describe('# followship request', () => {
 
       it('can not follow self', (done) => {
         request(app)
-          .post('/followships')
-          .send('id=1')
+          .post('/followships/1')
+          // .send('id=1')
           .set('Accept', 'application/json')
           .expect(200)
           .end(function(err, res) {
@@ -44,8 +44,8 @@ describe('# followship request', () => {
 
       it('will show followings', (done) => {
         request(app)
-          .post('/followships')
-          .send('id=2')
+          .post('/followships/2')
+          // .send('id=2')
           .set('Accept', 'application/json')
           .expect(302)
           .end(function(err, res) {
