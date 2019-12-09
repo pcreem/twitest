@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt-nodejs')
 const db = require('../models')
+const helpers = require('../_helpers');
 const Tweet = db.Tweet
 const User = db.User
 const Like = db.Like
@@ -55,10 +56,10 @@ const userController = {
   },
 
   addFollowing: (req, res) => {
-    if (req.user.id == req.params.userId) { return res.redirect('back') }
+    if (helpers.getUser(req).id == req.params.userId) { return res.redirect('back') }
     else {
       return Followship.create({
-        followerId: req.user.id,
+        followerId: helpers.getUser(req).id,
         followingId: req.params.userId
       })
         .then((followship) => {
@@ -70,7 +71,7 @@ const userController = {
   removeFollowing: (req, res) => {
     return Followship.findOne({
       where: {
-        followerId: req.user.id,
+        followerId: helpers.getUser(req).id,
         followingId: req.params.userId
       }
     })
@@ -92,32 +93,32 @@ const userController = {
         { model: User, as: 'Followings' }
       ]
     }).then(user => {
-      const isFollowed = req.user.Followings.map(d => d.id).includes(user.id)
-      user.introduction = user.introduction.substring(0, 140)
+      const isFollowed = helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
+      user.introduction = user.introduction ? user.introduction.substring(0, 140) : "",
 
-      Tweet.findAll({
-        where: { UserId: req.params.id },
-        order: [['createdAt', 'DESC']],
-        include: [Like, Reply, User]
-      }).then(tweets => {
+        Tweet.findAll({
+          where: { UserId: req.params.id },
+          order: [['createdAt', 'DESC']],
+          include: [Like, Reply, User]
+        }).then(tweets => {
+          //console.log(tweets)
+          tweets = tweets.map(tweet => ({
+            ...tweet.dataValues,
+            description: tweet.dataValues.description.substring(0, 140),
+            //isLiked: helpers.getUser(req).LikedTweets.map(d => d.id).includes(tweet.id)
+          }))
 
-        tweets = tweets.map(tweet => ({
-          ...tweet.dataValues,
-          description: tweet.dataValues.description.substring(0, 140),
-          isLiked: req.user.LikedTweets.map(d => d.id).includes(tweet.id)
-        }))
-
-        return res.render('users/profile', {
-          profile: user,
-          isFollowed: isFollowed,
-          tweets: tweets
+          return res.render('users/profile', {
+            profile: user,
+            isFollowed: isFollowed,
+            tweets: tweets
+          })
         })
-      })
 
     })
   },
   editUser: (req, res) => {
-    if (parseInt(req.params.id) !== req.user.id) {
+    if (parseInt(req.params.id) !== helpers.getUser(req).id) {
       req.flash('error_messages', '非使用者！')
       return res.redirect('/')
     }
@@ -128,7 +129,7 @@ const userController = {
     }
   },
   putUser: (req, res) => {
-    if (Number(req.params.id) !== Number(req.user.id)) {
+    if (Number(req.params.id) !== Number(helpers.getUser(req).id)) {
       return res.redirect(`/users/${req.params.id}`)
     }
     const { file } = req
@@ -161,7 +162,7 @@ const userController = {
 
   addLike: (req, res) => {
     return Like.create({
-      UserId: req.user.id,
+      UserId: helpers.getUser(req).id,
       TweetId: req.params.id
     })
       .then((tweet) => {
@@ -172,7 +173,7 @@ const userController = {
   removeLike: (req, res) => {
     return Like.findOne({
       where: {
-        UserId: req.user.id,
+        UserId: helpers.getUser(req).id,
         TweetId: req.params.id
       }
     })

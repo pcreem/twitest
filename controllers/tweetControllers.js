@@ -4,12 +4,12 @@ const User = db.User
 const Like = db.Like
 const Followship = db.Followship
 const Reply = db.Reply
-
+const helpers = require('../_helpers');
 const tweetController = {
 
   getTweets: (req, res) => {
     return User.findAll({
-      where: { id: { $not: req.user.id } },
+      where: { id: { $not: helpers.getUser(req).id } },
       include: [
         { model: User, as: 'Followers' },
         //{ model: Tweet, as: 'LikedTweets' }
@@ -30,7 +30,7 @@ const tweetController = {
         tweets = tweets.map(tweet => ({
           ...tweet.dataValues,
           description: tweet.dataValues.description ? tweet.dataValues.description.substring(0, 140) : "",
-          isLiked: req.user.LikedTweets.map(d => d.id).includes(tweet.id)
+          isLiked: helpers.getUser(req).LikedTweets.map(d => d.id).includes(tweet.id)
         }))
 
         return res.render('Tweets', {
@@ -44,7 +44,7 @@ const tweetController = {
   postTweets: (req, res) => {
     return Tweet.create({
       description: req.body.text,
-      UserId: req.user.id
+      UserId: helpers.getUser(req).id
     })
       .then((tweet) => {
         return res.redirect('Tweets')
@@ -55,7 +55,7 @@ const tweetController = {
     return Tweet.findByPk(req.params.tweet_id, {
       include: [Like, Reply, User, { model: User, as: 'LikedUsers' },]
     }).then(tweet => {
-      const isLiked = tweet.LikedUsers.map(d => d.id).includes(req.user.id)
+      const isLiked = tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id)
 
       User.findByPk(tweet.UserId, {
 
@@ -66,7 +66,7 @@ const tweetController = {
           { model: User, as: 'Followings' }
         ]
       }).then(user => {
-        const isFollowed = req.user.Followings.map(d => d.id).includes(user.id)
+        const isFollowed = helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
         user.introduction = user.dataValues.introduction ? user.dataValues.introduction.substring(0, 140) : ""
 
         Reply.findAll({
@@ -84,7 +84,7 @@ const tweetController = {
             replies: replies,
             tweet: tweet,
             profile: user,
-            loginUser: req.user,
+            loginUser: helpers.getUser(req),
             isFollowed: isFollowed,
             isLiked: isLiked
           })
@@ -96,7 +96,7 @@ const tweetController = {
   postReply: (req, res) => {
     return Reply.create({
       comment: req.body.text,
-      UserId: req.user.id,
+      UserId: helpers.getUser(req).id,
       TweetId: req.params.tweet_id
     })
       .then((tweet) => {
