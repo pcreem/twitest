@@ -30,7 +30,7 @@ const tweetController = {
         tweets = tweets.map(tweet => ({
           ...tweet.dataValues,
           description: tweet.dataValues.description ? tweet.dataValues.description.substring(0, 140) : "",
-          isLiked: helpers.getUser(req).LikedTweets.map(d => d.id).includes(tweet.id)
+          //isLiked: helpers.getUser(req).LikedTweets.map(d => d.id).includes(tweet.id)
         }))
 
         return res.render('Tweets', {
@@ -42,13 +42,21 @@ const tweetController = {
   },
 
   postTweets: (req, res) => {
-    return Tweet.create({
-      description: req.body.text,
+if (req.body.description.length >= 140) {
+      return Tweet.create({}).then((tweet) => {
+        return res.redirect('Tweets')
+      })
+}else{
+return Tweet.create({
+      description: req.body.description,
       UserId: helpers.getUser(req).id
     })
       .then((tweet) => {
         return res.redirect('Tweets')
       })
+}
+
+    
   },
 
   getReply: (req, res) => {
