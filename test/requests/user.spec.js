@@ -38,7 +38,6 @@ describe('# user request', () => {
           .end(function (err, res) {
             if (err) return done(err);
             res.text.should.include('User1 的 Tweet')
-            //console.log(res.text)
             return done();
           });
       })

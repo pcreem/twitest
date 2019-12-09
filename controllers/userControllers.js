@@ -90,7 +90,8 @@ const userController = {
         Tweet,
         Like,
         { model: User, as: 'Followers' },
-        { model: User, as: 'Followings' }
+        { model: User, as: 'Followings' },
+        { model: Tweet, as: 'LikedTweets' }
       ]
     }).then(user => {
       const isFollowed = helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
@@ -101,11 +102,10 @@ const userController = {
           order: [['createdAt', 'DESC']],
           include: [Like, Reply, User]
         }).then(tweets => {
-          //console.log(tweets)
           tweets = tweets.map(tweet => ({
             ...tweet.dataValues,
             description: tweet.dataValues.description.substring(0, 140),
-            //isLiked: helpers.getUser(req).LikedTweets.map(d => d.id).includes(tweet.id)
+            isLiked: user.LikedTweets.map(d => d.id).includes(tweet.id)
           }))
 
           return res.render('users/profile', {
