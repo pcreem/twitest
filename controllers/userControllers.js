@@ -56,11 +56,12 @@ const userController = {
   },
 
   addFollowing: (req, res) => {
-    if (helpers.getUser(req).id == req.params.userId) { 
+    if (helpers.getUser(req).id == req.params.userId) {
       return Followship.create({})
         .then((followship) => {
-          return res.redirect(200,'back')
-        }) }
+          return res.redirect(200, 'back')
+        })
+    }
     else {
       return Followship.create({
         followerId: helpers.getUser(req).id,
@@ -95,7 +96,7 @@ const userController = {
         Like,
         { model: User, as: 'Followers' },
         { model: User, as: 'Followings' },
-        { model: Tweet, as: 'LikedTweets' } 
+        { model: Tweet, as: 'LikedTweets' }
       ]
     }).then(user => {
       const isFollowed = helpers.getUser(req).Followings.map(d => d.id).includes(user.id)

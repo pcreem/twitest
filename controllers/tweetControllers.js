@@ -12,7 +12,7 @@ const tweetController = {
       where: { id: { $not: helpers.getUser(req).id } },
       include: [
         { model: User, as: 'Followers' },
-        //{ model: Tweet, as: 'LikedTweets' }
+        { model: Tweet, as: 'LikedTweets' }
       ]
     }).then(users => {
       users = users.map(user => ({
@@ -22,41 +22,52 @@ const tweetController = {
 
       }))
       users = users.sort((a, b) => b.FollowerCount - a.FollowerCount).splice(0, 10)
+      User.findByPk(helpers.getUser(req).id, {
 
-      Tweet.findAll({
-        order: [['createdAt', 'DESC']],
-        include: [Like, Reply, User]
-      }).then(tweets => {
-        tweets = tweets.map(tweet => ({
-          ...tweet.dataValues,
-          description: tweet.dataValues.description ? tweet.dataValues.description.substring(0, 140) : "",
-          //isLiked: helpers.getUser(req).LikedTweets.map(d => d.id).includes(tweet.id)
-        }))
+        include: [
+          Tweet,
+          Like,
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          { model: Tweet, as: 'LikedTweets' }
+        ]
+      }).then(user => {
 
-        return res.render('Tweets', {
-          users: users,
-          tweets: tweets
+        Tweet.findAll({
+          order: [['createdAt', 'DESC']],
+          include: [Like, Reply, User]
+        }).then(tweets => {
+          tweets = tweets.map(tweet => ({
+            ...tweet.dataValues,
+            description: tweet.dataValues.description ? tweet.dataValues.description.substring(0, 140) : "",
+            isLiked: user.LikedTweets.map(d => d.id).includes(tweet.id)
+          }))
+
+          return res.render('Tweets', {
+            users: users,
+            tweets: tweets
+          })
         })
       })
     })
   },
 
   postTweets: (req, res) => {
-if (req.body.description.length >= 140) {
+    if (req.body.description.length >= 140) {
       return Tweet.create({}).then((tweet) => {
         return res.redirect('Tweets')
       })
-}else{
-return Tweet.create({
-      description: req.body.description,
-      UserId: helpers.getUser(req).id
-    })
-      .then((tweet) => {
-        return res.redirect('Tweets')
+    } else {
+      return Tweet.create({
+        description: req.body.description,
+        UserId: helpers.getUser(req).id
       })
-}
+        .then((tweet) => {
+          return res.redirect('Tweets')
+        })
+    }
 
-    
+
   },
 
   getReply: (req, res) => {
